@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34024.191
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetMAUINotifications", "DotNetMAUINotifications.csproj", "{60EBF765-AD20-4DD3-A6BB-2A33DBCCC57E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{60EBF765-AD20-4DD3-A6BB-2A33DBCCC57E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60EBF765-AD20-4DD3-A6BB-2A33DBCCC57E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60EBF765-AD20-4DD3-A6BB-2A33DBCCC57E}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{60EBF765-AD20-4DD3-A6BB-2A33DBCCC57E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60EBF765-AD20-4DD3-A6BB-2A33DBCCC57E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60EBF765-AD20-4DD3-A6BB-2A33DBCCC57E}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A794756B-20ED-439C-9943-AA373972B383}
+	EndGlobalSection
+EndGlobal

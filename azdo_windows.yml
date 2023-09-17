@@ -1,0 +1,98 @@
+trigger:
+- '*'
+
+pool:
+  vmImage: 'windows-latest'
+  demands:
+  - MSBuild
+
+variables:
+    BuildConfiguration: Release
+    DotNetVersion: 7.0.400
+#    VSVERSION: 17/pre
+
+stages:
+
+- stage: MauiBuild
+  jobs:
+  - job: MauiBuild
+    displayName: Maui Build
+    steps:    
+    - task: UseDotNet@2
+      displayName: .NET Version
+      inputs:
+        packageType: 'sdk'
+        version: '$(DotNetVersion)'
+        
+    - task: Bash@3
+      displayName: Install MAUI
+      inputs:
+        targetType: 'inline'
+        script: |
+          dotnet nuget locals all --clear 
+          dotnet workload install maui wasm-tools android --source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet7/nuget/v3/index.json --source https://api.nuget.org/v3/index.json
+
+    - task: NuGetRestore@1
+
+    - task: JavaToolInstaller@0
+      inputs:
+        versionSpec: '11'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
+
+  # https://docs.microsoft.com/en-us/dotnet/maui/android/deployment/overview
+    - task: Bash@3
+      displayName: Build Android App
+      inputs:
+        targetType: 'inline'
+        script: |
+          dotnet build -f net7.0-android33.0 -c Release
+
+    # Signing Android App : https://docs.microsoft.com/en-us/azure/devops/pipelines/apps/mobile/app-signing?view=azure-devops&tabs=apple-install-during-build#sign-your-android-app
+
+    - task: CopyFiles@2
+      displayName: Copy APK Files
+      inputs:
+        Contents: |
+          bin\Release\net7.0-android33.0\*.apk
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+    - task: PublishBuildArtifacts@1
+      displayName: Publish APK Files
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop_android'
+        publishLocation: 'Container'
+
+    # https://docs.microsoft.com/en-us/dotnet/maui/windows/deployment/overview
+    - task: PowerShell@2
+      displayName: Build Windows MSIX
+      inputs:
+        targetType: 'inline'
+        script: |
+          dotnet publish -f net7.0-windows10.0.19041.0 -c Release
+    
+    # https://docs.microsoft.com/en-us/windows/msix/desktop/cicd-overview
+#    - task: DownloadSecureFile@1
+#      inputs:
+#        secureFile: '<WINDOWS SIGNING CERT PFX>'
+
+    - task: CopyFiles@2
+      displayName: Copy MSIX Files
+      inputs:
+        Contents: |
+          bin\Release\net7.0-windows10.0.19041.0\win10-x64/**/*.msix
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+   
+   #https://docs.microsoft.com/en-us/windows/msix/desktop/azure-dev-ops
+   #Create secret pipeline variable WindowsCertSecret with cert password
+#    - script: '"C:\Program Files (x86)\Windows Kits\10\App Certification Kit\SignTool" sign /fd SHA256 /f $(Agent.TempDirectory)/XamCATFidCert.pfx /p $(WindowsCertSecret)# $(Build.ArtifactStagingDirectory)\6.0\Apps\WeatherTwentyOne\src\WeatherTwentyOne\bin\Release\net7.0-windows10.0.19041.0\win10-x64\AppPackages\WeatherTwentyOne_1.0.0.0_Test\WeatherTwentyOne_1.0.0.0_x64.msix'
+#      displayName: 'Sign MSIX Package'
+
+    - task: PublishBuildArtifacts@1
+      displayName: Publish MSIX Files
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop_windows'
+        publishLocation: 'Container'
+
